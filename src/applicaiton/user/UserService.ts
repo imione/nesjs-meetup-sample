@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Transactional } from 'src/core/database/typeorm/Transactional';
 import { User } from 'src/domain/user/User';
 import {
   IUserRepository,
@@ -12,6 +13,7 @@ export class UserService {
     @Inject(UserRepositoryKey) private readonly userRepository: IUserRepository,
   ) {}
 
+  @Transactional()
   async createUser(command: CreateUserCommand) {
     const { name, password } = command;
 

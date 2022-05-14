@@ -1,5 +1,5 @@
 import { FindOneOptions, Repository } from 'typeorm';
-import { Type } from '@nestjs/common';
+import { Inject, Type } from '@nestjs/common';
 
 import { MysqlDataSource } from 'src/core/database/typeorm/TypeormDatabase';
 
@@ -8,6 +8,7 @@ import { Identity } from 'src/domain/generic/Identity';
 import { IGenericRepository } from 'src/domain/generic/IGenericRepository';
 import { RootTypeOrmEntity } from './RootTypeOrmEntity';
 import { EntityMapper } from '../EntityMapper';
+import { TransactionManager } from 'src/core/database/typeorm/TransactionManager';
 
 export abstract class GenericTypeOrmRepo<
   TAgg extends AggregateRoot<TId>,
@@ -15,6 +16,9 @@ export abstract class GenericTypeOrmRepo<
   TDalEntity extends RootTypeOrmEntity,
 > implements IGenericRepository<TAgg, TId>
 {
+  @Inject(TransactionManager)
+  private readonly trxManager: TransactionManager;
+
   constructor(private readonly mapper: EntityMapper<TAgg, TId, TDalEntity>) {}
 
   abstract nextId(): TId;
@@ -49,6 +53,8 @@ export abstract class GenericTypeOrmRepo<
   }
 
   private getTypeOrmRepository(): Repository<TDalEntity> {
-    return MysqlDataSource.getRepository(this.getEntityType());
+    return this.trxManager
+      .getEntityManager()
+      .getRepository(this.getEntityType());
   }
 }
