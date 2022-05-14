@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Transactional } from 'src/core/database/typeorm/Transactional';
 import { IPublisher } from 'src/core/messaging/publisher/IPublisher';
-import { SimplePublisher } from 'src/core/messaging/publisher/simple/SimplePublisher';
+import { OutboxPublisher } from 'src/core/messaging/publisher/outbox/OutboxPublisher';
 import { User } from 'src/domain/user/User';
 import {
   IUserRepository,
@@ -14,7 +14,7 @@ import { UserCreated } from './message/UserCreated';
 export class UserService {
   constructor(
     @Inject(UserRepositoryKey) private readonly userRepository: IUserRepository,
-    @Inject(SimplePublisher) private readonly messagePublisher: IPublisher,
+    @Inject(OutboxPublisher) private readonly messagePublisher: IPublisher,
   ) {}
 
   @Transactional()
