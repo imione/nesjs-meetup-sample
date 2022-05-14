@@ -10,4 +10,14 @@ export class AggregateRoot<TId extends Identity> extends Entity<TId> {
   ) {
     super(id);
   }
+
+  getCreatedAt(): Date {
+    return this.createdAt;
+  }
+  getUpdatedAt(): Date {
+    return this.updatedAt;
+  }
+  getDeletedAt(): Date | null {
+    return this.deletedAt;
+  }
 }
