@@ -1,5 +1,7 @@
-import { DataSource, FindOneOptions, Repository } from 'typeorm';
-import { Inject, Type } from '@nestjs/common';
+import { FindOneOptions, Repository } from 'typeorm';
+import { Type } from '@nestjs/common';
+
+import { MysqlDataSource } from 'src/core/database/typeorm/TypeormDatabase';
 
 import { AggregateRoot } from 'src/domain/generic/AggregateRoot';
 import { Identity } from 'src/domain/generic/Identity';
@@ -13,8 +15,6 @@ export abstract class GenericTypeOrmRepo<
   TDalEntity extends RootTypeOrmEntity,
 > implements IGenericRepository<TAgg, TId>
 {
-  @Inject(DataSource) private readonly dataSource: DataSource;
-
   constructor(private readonly mapper: EntityMapper<TAgg, TId, TDalEntity>) {}
 
   abstract nextId(): TId;
@@ -49,6 +49,6 @@ export abstract class GenericTypeOrmRepo<
   }
 
   private getTypeOrmRepository(): Repository<TDalEntity> {
-    return this.dataSource.getRepository(this.getEntityType());
+    return MysqlDataSource.getRepository(this.getEntityType());
   }
 }
