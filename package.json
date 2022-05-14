@@ -26,10 +26,12 @@
     "@nestjs/platform-express": "^8.0.0",
     "@typedorm/common": "^1.14.11",
     "@typedorm/core": "^1.14.11",
+    "aws-sdk": "^2.1135.0",
     "cls-hooked": "^4.2.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "sqs-consumer": "^5.7.0",
     "typeorm": "^0.3.6",
     "uuid": "^8.3.2"
   },
