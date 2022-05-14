@@ -1,7 +1,7 @@
 import { Attribute } from '@typedorm/common';
 import { RootDalEntity } from '../RootDalEntity';
 
-export abstract class RootTypeOrmEntity extends RootDalEntity {
+export abstract class RootTypeDOrmEntity extends RootDalEntity {
   @Attribute()
   id: string;
 

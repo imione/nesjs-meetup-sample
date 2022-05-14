@@ -1,30 +1,27 @@
-import { DataSource, FindOneOptions, Repository } from 'typeorm';
 import { Type } from '@nestjs/common';
+import { getEntityManager } from '@typedorm/core';
+import {} from '@typedorm/common';
 
 import { AggregateRoot } from 'src/domain/generic/AggregateRoot';
 import { Identity } from 'src/domain/generic/Identity';
 import { IGenericRepository } from 'src/domain/generic/IGenericRepository';
-import { RootTypeOrmEntity } from './RootTypeOrmEntity';
+import { RootTypeDOrmEntity } from './RootTypeDOrmEntity';
 import { EntityMapper } from '../EntityMapper';
 
-export abstract class GenericTypeOrmRepo<
+export abstract class GenericTypeDOrmRepo<
   TAgg extends AggregateRoot<TId>,
   TId extends Identity,
-  TDalEntity extends RootTypeOrmEntity,
+  TDalEntity extends RootTypeDOrmEntity,
 > implements IGenericRepository<TAgg, TId>
 {
-  private readonly dataSource: DataSource;
-  private readonly mapper: EntityMapper<TAgg, TId, TDalEntity>;
+  constructor(private readonly mapper: EntityMapper<TAgg, TId, TDalEntity>) {}
 
-  abstract nextId: () => TId;
+  abstract nextId(): TId;
 
   async findOne(id: TId): Promise<TAgg | null> {
     const { key } = id;
 
-    const findOption: FindOneOptions = { where: { id: key } };
-
-    const repository = this.getTypeOrmRepository();
-    const entity = await repository.findOne(findOption);
+    const entity = await getEntityManager().findOne(this.getEntityType(), key);
 
     if (!entity) {
       return null;
@@ -34,20 +31,27 @@ export abstract class GenericTypeOrmRepo<
   }
 
   async save(aggregate: TAgg): Promise<void> {
+    const entityManager = getEntityManager();
     const dalEntity = this.mapper.toDalEntity(aggregate);
-    await this.getTypeOrmRepository().save(dalEntity);
+    const { id } = dalEntity;
+    const exist = await entityManager.exists(this.getEntityType(), id);
+
+    if (exist) {
+      await entityManager.update(this.getEntityType(), { id }, dalEntity);
+    } else {
+      await entityManager.create(dalEntity);
+    }
   }
 
   async remove(aggregate: TAgg): Promise<void> {
+    const entityManager = getEntityManager();
     const dalEntity = this.mapper.toDalEntity(aggregate);
-    await this.getTypeOrmRepository().remove(dalEntity);
+    const { id } = dalEntity;
+
+    await entityManager.delete(this.getEntityType(), { id });
   }
 
   private getEntityType(): Type<TDalEntity> {
     return Reflect.getMetadata(this.constructor.name, this.constructor);
-  }
-
-  private getTypeOrmRepository(): Repository<TDalEntity> {
-    return this.dataSource.getRepository(this.getEntityType());
   }
 }

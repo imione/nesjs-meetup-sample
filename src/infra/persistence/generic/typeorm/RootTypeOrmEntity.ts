@@ -1,7 +1,6 @@
 import {
   Entity,
   PrimaryColumn,
-  Column,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
@@ -12,9 +11,6 @@ import { RootDalEntity } from '../RootDalEntity';
 export abstract class RootTypeOrmEntity extends RootDalEntity {
   @PrimaryColumn()
   id: string;
-
-  @Column({ type: 'int' })
-  version: number;
 
   @CreateDateColumn()
   createdAt: Date;

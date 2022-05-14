@@ -7,6 +7,6 @@ export abstract class EntityMapper<
   TId extends Identity,
   TDalEntity extends RootDalEntity,
 > {
-  toAggregate: (dalEntity: TDalEntity) => TAgg;
-  toDalEntity: (aggregate: TAgg) => TDalEntity;
+  abstract toAggregate(dalEntity: TDalEntity): TAgg;
+  abstract toDalEntity(aggregate: TAgg): TDalEntity;
 }
